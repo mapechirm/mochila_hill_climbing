@@ -1,7 +1,6 @@
 import numpy as np
 import copy
 
-global peso_mochila
 peso_mochila = int(input("Ingrese el peso de la mochila: "))
 
 class Item:
@@ -23,7 +22,7 @@ def ingresar_item(items, item):
 def calc_peso(items) :
     peso = 0
     for item in items:
-        if (item.estado == 1):
+        if (item.estado == True):
             peso = peso + item.peso
 
     return peso
@@ -31,13 +30,15 @@ def calc_peso(items) :
 
 def llenar_mochila(mochila) :
     local_mochila = copy.deepcopy(mochila)
-    while (calc_peso(local_mochila) <= peso_mochila):
+    while (calc_peso(local_mochila) < peso_mochila):
         pos = int(np.random.uniform(0,len(local_mochila)))
         if (local_mochila[pos].estado == False):
             if (calc_peso(local_mochila) + local_mochila[pos].peso <= peso_mochila):
                 local_mochila[pos].estado = True
             else:
-                return local_mochila
+                break
+
+    return local_mochila
 
 
 def imprimir_mochila(mochila) :
@@ -47,13 +48,14 @@ def imprimir_mochila(mochila) :
 def calc_valor(items):
     valor = 0
     for item in items:
-        if (item.estado == 1):
+        if (item.estado == True):
             valor = valor + item.valor
 
     return valor
 
 def main() :
-    saltos = int(input("Ingrese el numero de saltos: "))
+    global peso_mochila
+
     mochila = [
         Item(4,1,"Telefono",False),
         Item(2,2,"Tableta",False),
@@ -62,13 +64,19 @@ def main() :
         Item(1,1,"Estuchera",False),
         Item(2,2,"Botella",False),
     ]
+
+    while(peso_mochila > sum(x.peso for x in mochila)):
+        peso_mochila = int(input("Ingrese un peso valido para la mochila: "))
+
+
+    saltos = int(input("Ingrese el numero de saltos: "))
     sol = llenar_mochila(mochila)
+
     for i in range(saltos):
         vecino = llenar_mochila(mochila)
 
         valor_vecino = calc_valor(vecino) 
         valor_sol = calc_valor(sol) 
-
         peso_vecino = calc_peso(vecino)
 
         if (valor_vecino > valor_sol and peso_vecino <= peso_mochila):
